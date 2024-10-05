@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mdtosif/lumel/config"
 	"github.com/mdtosif/lumel/service"
 )
 
@@ -32,8 +33,13 @@ func AddOrdersFromCSV(c *gin.Context) {
 		return
 	}
 
-	for _,data := range csvData{
+	for _, data := range csvData {
 		fmt.Println("orderId:", data.OrderID)
+		err := service.ImportOrder(config.DB, data)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to open the file"})
+			return
+		}
 	}
 
 	// Respond with a success message

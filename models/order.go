@@ -8,9 +8,9 @@ import (
 )
 
 type Order struct {
-    ID              uint           `gorm:"primaryKey" json:"id"`
-    ProductID       uint           `gorm:"not null" json:"product_id"`
-    CustomerID      uint           `gorm:"not null" json:"customer_id"`
+    ID              int           `gorm:"primaryKey" json:"id"`
+    ProductID       string           `gorm:"not null" json:"product_id"`
+    CustomerID      string           `gorm:"not null" json:"customer_id"`
     PaymentID       uint           `gorm:"not null" json:"payment_id"`
     QuantitySold    int            `json:"quantity_sold"`
     Discount        float64        `json:"discount"`

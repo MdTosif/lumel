@@ -8,7 +8,7 @@ import (
 )
 
 type OrderCSV struct {
-	OrderID         string  `csv:"Order ID"`
+	OrderID         int  `csv:"Order ID"`
 	ProductID       string  `csv:"Product ID"`
 	CustomerID      string  `csv:"Customer ID"`
 	ProductName     string  `csv:"Product Name"`

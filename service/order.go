@@ -7,19 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func ImportOrder(db *gorm.DB, order OrderCSV) error {
+// var DB *gorm.DB = config.DB
+
+func ImportOrder(DB *gorm.DB, order OrderCSV) error {
 	// Map the OrderCSV to the Product model
 	product := models.Product{
+		ID:       order.ProductID,
 		Name:     order.ProductName,
 		Category: order.Category,
 		Price:    order.UnitPrice,
 	}
 
 	// Check if product exists and create or update accordingly
-	if err := db.Where("name = ?", product.Name).First(&product).Error; err != nil {
+	if err := DB.Where("id = ?", product.ID).First(&product).Error; err != nil {
 		// Create the product if not found
 		if err == gorm.ErrRecordNotFound {
-			if err := db.Create(&product).Error; err != nil {
+			if err := DB.Create(&product).Error; err != nil {
 				return err
 			}
 		} else {
@@ -29,16 +32,17 @@ func ImportOrder(db *gorm.DB, order OrderCSV) error {
 
 	// Map the OrderCSV to the Customer model
 	customer := models.Customer{
+		ID:      order.CustomerID,
 		Name:    order.CustomerName,
 		Email:   order.CustomerEmail,
 		Address: order.CustomerAddress,
 	}
 
 	// Check if customer exists and create or update accordingly
-	if err := db.Where("email = ?", customer.Email).First(&customer).Error; err != nil {
+	if err := DB.Where("id = ?", customer.ID).First(&customer).Error; err != nil {
 		// Create the customer if not found
 		if err == gorm.ErrRecordNotFound {
-			if err := db.Create(&customer).Error; err != nil {
+			if err := DB.Create(&customer).Error; err != nil {
 				return err
 			}
 		} else {
@@ -52,10 +56,10 @@ func ImportOrder(db *gorm.DB, order OrderCSV) error {
 	}
 
 	// Check if payment method exists and create or update accordingly
-	if err := db.Where("method = ?", payment.Method).First(&payment).Error; err != nil {
+	if err := DB.Where("method = ?", payment.Method).First(&payment).Error; err != nil {
 		// Create the payment method if not found
 		if err == gorm.ErrRecordNotFound {
-			if err := db.Create(&payment).Error; err != nil {
+			if err := DB.Create(&payment).Error; err != nil {
 				return err
 			}
 		} else {
@@ -65,6 +69,7 @@ func ImportOrder(db *gorm.DB, order OrderCSV) error {
 
 	// Create the Order
 	orderRecord := models.Order{
+		ID:           order.OrderID,
 		ProductID:    product.ID,
 		CustomerID:   customer.ID,
 		PaymentID:    payment.ID,
@@ -74,7 +79,19 @@ func ImportOrder(db *gorm.DB, order OrderCSV) error {
 		DateOfSale:   parseDate(order.DateOfSale),
 	}
 
-	return db.Create(&orderRecord).Error
+	// Check if payment method exists and create or update accordingly
+	if err := DB.Where("id = ?", orderRecord.ID).First(&orderRecord).Error; err != nil {
+		// Create the payment method if not found
+		if err == gorm.ErrRecordNotFound {
+			if err := DB.Create(&orderRecord).Error; err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func parseDate(dateStr string) time.Time {

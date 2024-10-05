@@ -2,7 +2,7 @@
 package models
 
 type Product struct {
-    ID                 uint   `gorm:"primaryKey" json:"id"`
+    ID                 string   `gorm:"primaryKey" json:"id"`
     Name               string `gorm:"type:varchar(255);not null" json:"name"`
     Category           string `gorm:"type:varchar(100)" json:"category"`
     Description        string `gorm:"type:text" json:"description"` // Optional
