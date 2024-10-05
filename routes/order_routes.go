@@ -6,10 +6,6 @@ import (
 )
 
 func OrderRoutes(r *gin.Engine) {
-    // Route to get all orders
-    r.GET("/orders", controllers.GetOrders)
-
-    // Route to get a specific order by its ID
-    r.GET("/orders/:id", controllers.GetOrderByID)
-    r.GET("/orders/import", controllers)
+  
+    r.POST("/orders/import", controllers.AddOrdersFromCSV)
 }

@@ -1,79 +1,41 @@
 package controllers
 
 import (
-	"encoding/csv"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mdtosif/lumel/config"
-	"github.com/mdtosif/lumel/models"
+	"github.com/mdtosif/lumel/service"
 )
 
-// Get all orders
-func GetOrders(c *gin.Context) {
-	var orders []models.Order
-	result := config.DB.Find(&orders)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, orders)
-}
-
 // Get order by ID
-func GetOrderByID(c *gin.Context) {
-	id := c.Param("id")
-	var order models.Order
-
-	// Convert the id from string to uint
-	orderID, err := strconv.ParseUint(id, 10, 32)
+func AddOrdersFromCSV(c *gin.Context) {
+	// Accept a file from the form
+	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file is received"})
 		return
 	}
 
-	result := config.DB.First(&order, orderID)
-	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+	// Open the uploaded file
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to open the file"})
 		return
 	}
-	c.JSON(http.StatusOK, order)
-}
+	defer src.Close()
 
-// Get order by ID
-func AddOrdersFromCSVfunc(c *gin.Context) {
-    // Accept a file from the form
-    file, err := c.FormFile("file")
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "No file is received"})
-        return
-    }
+	csvData, err := service.ReadCSV(src)
 
-    // Open the uploaded file
-    src, err := file.Open()
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to open the file"})
-        return
-    }
-    defer src.Close()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to open the file"})
+		return
+	}
 
-    // Create a new CSV reader
-    reader := csv.NewReader(src)
+	for _,data := range csvData{
+		fmt.Println("orderId:", data.OrderID)
+	}
 
-    // Read all records from the CSV
-    records, err := reader.ReadAll()
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading CSV data"})
-        return
-    }
-
-    // Process the CSV records (for demonstration, we're just printing them)
-    for _, record := range records {
-        fmt.Println(record)
-    }
-
-    // Respond with a success message
-    c.JSON(http.StatusOK, gin.H{"message": "CSV file processed successfully"})
+	// Respond with a success message
+	c.JSON(http.StatusOK, gin.H{"message": "CSV file processed successfully"})
 }

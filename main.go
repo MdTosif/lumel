@@ -17,5 +17,5 @@ func main() {
     r := routes.InitRoutes()
 
     // Start the server on port 8080
-    r.Run(":8080")  // You can change the port if needed
+    r.Run(":8000")  // You can change the port if needed
 }
