@@ -9,9 +9,8 @@ The Lumel API provides endpoints to manage orders and retrieve insights into pro
 Project Setup
 -------------
 
-To set up the project, change the database credentials in `./config/database.go`. (Note: There hasn't been time to separate this configuration into a dedicated file.)
+To set up the project, change the database credentials in `./config/database.go`. (Note: There hasn't been time to separate this configuration into a dedicated file.). postman collection docs link: https://documenter.getpostman.com/view/12703692/2sAXxMftZz
 
-postman collection docs link: https://documenter.getpostman.com/view/12703692/2sAXxMftZz
 Endpoints
 ---------
 
